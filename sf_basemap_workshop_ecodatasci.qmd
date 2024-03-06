@@ -64,6 +64,8 @@ library(maptiles)  # retrieving basemap
 library(terra)     # working with raster data
 library(tidyterra) # functions for working with raster
 
+library(prettymapr)
+
 # Data 
 library(tigris)  # shapefiles with various administrative boundaries and roads
 
@@ -443,7 +445,7 @@ Below I list the providers of various basemaps
 
 - [Mapbox](https://www.mapbox.com/static-maps)*
 
-- Google
+- Google*
 
 
 ![](data/basemap_types.png)
@@ -468,6 +470,8 @@ My favorites:
     - pretty easy to download 
     
     - doesn't 
+    
+    - downloads it as a raster, so Rachel uses tidyterra to do something with it then...
 
 **Other Packages to Examine**
 
@@ -570,7 +574,13 @@ map_nobase + map_wbase
 Yes, the projection is different! That is one of the annoying things about 
 using ggspatial - it downloads the basemaps in a specific CRS - the Web Mercator
 projection (`EPSG:3857`). If it is the first layer added, then other layers are
-reprojected to Web Mercator, which is why the two maps look different. 
+reprojected to Web Mercator, which is why the two maps look different.
+
+## Rachel is not sure that reprojecting your base map is a good idea....compare the coloring of the two maps produced.
+## She recommends reprojecting your data to your base map.
+
+
+
 
 If you want to have the map in the CRS of the data, specify a data argument in the 
 call to `ggplot()`.
@@ -614,7 +624,7 @@ OpenStreetMap.
 
 ```{r}
 ca3857 <- st_transform(ca_proj_sf, "epsg:3857")
-ca_osm <- get_tiles(ca3857, crop = TRUE)
+ca_osm <- get_tiles(ca3857, crop = TRUE)   # downloads base map layer
 
 ggplot(data = ca3857) + 
   geom_spatraster_rgb(data = ca_osm, r = 1, g = 2, b = 3) +
@@ -818,8 +828,8 @@ ggplot(data = ca_proj_sf) + # specify data here to set CRS
   ) +
   ggspatial::annotation_scale(
     pad_y = unit(0.5, "cm"), 
-    width_hint = 0.3,
-    unit_category = "imperial"
+    width_hint = 0.3, # want it to take about 30% of the width of the plot
+    unit_category = "imperial"  # change from metric to imperial units (km to miles)
     ) +
   ggspatial::annotation_north_arrow(
     pad_y = unit(1, "cm"),
